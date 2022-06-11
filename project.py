@@ -45,15 +45,30 @@ n = len(w)
 E,suma = prim(w,n,s)
 print(E,suma)
 
-nombres = ["Ymir","Shina","Maria","Levi","Rose","Eren","Mikasa","Armin"]
+personas = {
+        "Ymir"  :{"edad":22},
+        "Shina" :{"edad":10},
+        "Maria" :{"edad":5 },
+        "Levi"  :{"edad":25},
+        "Rose"  :{"edad":28},
+        "Eren"  :{"edad":50},
+        "Mikasa":{"edad":40},
+        "Armin" :{"edad":17},
+}
 
-E_nombres = [[nombres[E[i][0]],nombres[E[i][1]]] for i in range(len(E))]
+E_nombres = [[list(personas)[E[i][0]],list(personas)[E[i][1]]] for i in range(len(E))]
+print("Nombres de donadores:")
+j = 0
+for i in range(len(E_nombres)):
+    if(personas[E_nombres[i][1]]["edad"] >= 18):
+        j += 1
+        print(j,E_nombres[i][1])
 
 g = nx.Graph()
 for i in range(n):
     for j in range(n):
         if w[i][j] < inf:
-            g.add_edge(nombres[i],nombres[j],weight=w[i][j])
+            g.add_edge(list(personas)[i],list(personas)[j],weight=w[i][j])
 
 color_map = ["green" if i == 0 else "red" for i in range(n) ]
 
