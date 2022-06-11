@@ -44,30 +44,45 @@ w = [
 n = len(w)
 E,suma = prim(w,n,s)
 print(E,suma)
+
+nombres = ["Ymir","Shina","Maria","Levi","Rose","Eren","Mikasa","Armin"]
+
+E_nombres = [[nombres[E[i][0]],nombres[E[i][1]]] for i in range(len(E))]
+
 g = nx.Graph()
 for i in range(n):
     for j in range(n):
         if w[i][j] < inf:
-            g.add_edge(i,j,weight=w[i][j])
+            g.add_edge(nombres[i],nombres[j],weight=w[i][j])
+
+color_map = ["green" if i == 0 else "red" for i in range(n) ]
 
 pos = graphviz_layout(g, prog="dot")
-nx.draw(g,
+
+# dibujar todas las conexiones
+#nx.draw(g,
+#        pos,
+#        with_labels=True,
+#        node_color="tab:red",
+#        edge_color="tab:gray",
+#        node_size=500,
+#        width=1,
+#)
+
+# dibujar arbol de prim pintando nodo inicial de verde
+nx.draw(nx.Graph(E_nombres),
         pos,
         with_labels=True,
-        node_color="tab:red",
-        edge_color="tab:gray",
-        node_size=500,
-        width=1,
-)
-nx.draw(nx.Graph(E),
-        pos,
-        with_labels=True,
-        node_color="tab:red",
+        node_color=color_map,
         edge_color="tab:blue",
         node_size=500,
         width=3,
 )
+
+# dibujar pesos en aristas
 edge_labels = nx.get_edge_attributes(g, "weight")
 nx.draw_networkx_edge_labels(g, pos, edge_labels)
+
+# desplegar grafo en pantalla
 plt.draw()
 plt.show()
