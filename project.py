@@ -44,3 +44,30 @@ w = [
 n = len(w)
 E,suma = prim(w,n,s)
 print(E,suma)
+g = nx.Graph()
+for i in range(n):
+    for j in range(n):
+        if w[i][j] < inf:
+            g.add_edge(i,j,weight=w[i][j])
+
+pos = graphviz_layout(g, prog="dot")
+nx.draw(g,
+        pos,
+        with_labels=True,
+        node_color="tab:red",
+        edge_color="tab:gray",
+        node_size=500,
+        width=1,
+)
+nx.draw(nx.Graph(E),
+        pos,
+        with_labels=True,
+        node_color="tab:red",
+        edge_color="tab:blue",
+        node_size=500,
+        width=3,
+)
+edge_labels = nx.get_edge_attributes(g, "weight")
+nx.draw_networkx_edge_labels(g, pos, edge_labels)
+plt.draw()
+plt.show()
