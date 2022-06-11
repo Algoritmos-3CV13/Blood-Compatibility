@@ -45,24 +45,41 @@ n = len(w)
 E,suma = prim(w,n,s)
 print(E,suma)
 
+compatibilidad = {
+        "a+": {"recibe":["a+","a-","o+","o-"]},
+        "o+": {"recibe":["o+","o-"]},
+        "b+": {"recibe":["b+","b-","o+","o-"]},
+        "ab+":{"recibe":["a+","o+","b+","ab+","a-","o-","b","ab"]},
+        "a-": {"recibe":["a-","o-"]},
+        "o-": {"recibe":["o-"]},
+        "b":  {"recibe":["b-","o-"]},
+        "ab": {"recibe":["ab-","a-","b-","o-"]},
+};
+
 personas = {
-        "Ymir"  :{"edad":22},
-        "Shina" :{"edad":10},
-        "Maria" :{"edad":5 },
-        "Levi"  :{"edad":25},
-        "Rose"  :{"edad":28},
-        "Eren"  :{"edad":50},
-        "Mikasa":{"edad":40},
-        "Armin" :{"edad":17},
+        "Ymir"  :{"edad":82,"tipo":"a+" },
+        "Shina" :{"edad":48,"tipo":"o+" },
+        "Maria" :{"edad":39,"tipo":"b+" },
+        "Levi"  :{"edad":25,"tipo":"ab+"},
+        "Rose"  :{"edad":50,"tipo":"a-" },
+        "Eren"  :{"edad":50,"tipo":"o-" },
+        "Mikasa":{"edad":10,"tipo":"b-" },
+        "Armin" :{"edad":17,"tipo":"ab-"},
 }
+
+sangre_receptor = personas[list(personas)[s]]["tipo"]
+print(f"\nPersona receptora: {list(personas)[s]} {personas[list(personas)[s]]}\n")
 
 E_nombres = [[list(personas)[E[i][0]],list(personas)[E[i][1]]] for i in range(len(E))]
 print("Nombres de donadores:")
 j = 0
 for i in range(len(E_nombres)):
-    if(personas[E_nombres[i][1]]["edad"] >= 18):
+    nombre_donador = E_nombres[i][1]
+    edad = personas[nombre_donador]["edad"]
+    sangre = personas[nombre_donador]["tipo"]
+    if(18 <= edad <= 65 and sangre in compatibilidad[sangre_receptor]["recibe"]):
         j += 1
-        print(j,E_nombres[i][1])
+        print(f"{j} {nombre_donador} {personas[nombre_donador]}")
 
 g = nx.Graph()
 for i in range(n):
