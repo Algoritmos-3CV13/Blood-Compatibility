@@ -55,12 +55,15 @@ def find_donors(personas,persona_receptora):
     E_nombres = [[list(personas)[E[i][0]],list(personas)[E[i][1]]] for i in range(len(E))]  # obtener aristas por nombre
     print("Nombres de donadores:")
     j = 0
+
+    index_donantes = []
     for i in range(len(E_nombres)):                 # aplicar filtros para descartar personas que no pueden donar
         nombre_donador = E_nombres[i][1]
         edad = personas[nombre_donador]["edad"]     # el donante debe tener la edad apropiada para donar
         sangre = personas[nombre_donador]["tipo"]   # y el tipo de sangre debe ser compatible
         if(18 <= edad <= 65 and sangre in compatibilidad[sangre_receptor]["recibe"]):
             j += 1
+            index_donantes.append(i)
             print(f"{j} {nombre_donador} {personas[nombre_donador]}")
     
     g = nx.Graph()
@@ -70,7 +73,10 @@ def find_donors(personas,persona_receptora):
             if peso < inf:
                 g.add_edge(list(personas)[i],list(personas)[j],weight=w[i,j])   # agregar arista con peso
     
-    color_map = ["green" if i == 0 else "red" for i in range(n) ]       # definir color de vertices
+    color_map = ["red" for i in range(n) ]       # definir color de vertices
+    color_map[0] = "green"                       # receptor
+    for i in range(len(index_donantes)):
+        color_map[index_donantes[i]+1] = "orange"# candidatos elegidos
     
     # definir estilo de grafo
     pos = graphviz_layout(g, prog="dot")
@@ -81,7 +87,7 @@ def find_donors(personas,persona_receptora):
             with_labels=True,
             node_color="tab:red",
             edge_color="tab:gray",
-            node_size=500,
+            node_size=2000,
             width=1,
     )
     
@@ -91,7 +97,7 @@ def find_donors(personas,persona_receptora):
             with_labels=True,
             node_color=color_map,
             edge_color="tab:blue",
-            node_size=500,
+            node_size=2000,
             width=3,
     )
     
