@@ -28,6 +28,19 @@ def prim(w,n,s):
         E.append(e)                 # agregar aristas
     return E,suma
 
+def get_edges(personas,n):
+    personas_key = [list(personas)[i] for i in range(n)]
+    aristas = {}
+    for i in range(n):
+        key = personas_key[i]
+        hijos = personas[key]["hijos"]
+        indexes = [personas_key.index(hijos[i]) for i in range(len(hijos))]
+        for j in range(len(indexes)):
+            if len(indexes) > 0:
+                aristas[(i,indexes[j])] = personas[key]["weight"][j]
+                aristas[(indexes[j],i)] = personas[key]["weight"][j]
+    return aristas
+
 inf = math.inf
 
 compatibilidad = {
@@ -58,22 +71,9 @@ personas = {
 
 n = len(personas)
 s = list(personas).index("Eren")
+w = get_edges(personas,n)
 
-personas_key = [list(personas)[i] for i in range(n)]
-
-aristas = {}
-for i in range(n):
-    key = personas_key[i]
-    hijos = personas[key]["hijos"]
-    indexes = [personas_key.index(hijos[i]) for i in range(len(hijos))]
-    for j in range(len(indexes)):
-        if len(indexes) > 0:
-            aristas[(i,indexes[j])] = personas[key]["weight"][j]
-            aristas[(indexes[j],i)] = personas[key]["weight"][j]
-
-w = aristas
-
-E,suma = prim(aristas,n,s)
+E,suma = prim(w,n,s)
 print(f"Despues de aplicar prim:\nAristas = {E}\nd = {suma}")
 
 sangre_receptor = personas[list(personas)[s]]["tipo"]
