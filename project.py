@@ -23,25 +23,87 @@ def prim(w,n,s):
                         agregar_vertice = k # agregar el vertice con arista más pequeña
                         e = [j,k]           # guardar posición
                         minimo = peso       # actualizar el peso minimo
-        suma += w[e[0],e[1]]       # sumar peso
+        suma += w[e[0],e[1]]        # sumar peso
         v[agregar_vertice] = 1      # nodo ya visitado
         E.append(e)                 # agregar aristas
     return E,suma
 
-def get_edges(personas,n):
-    personas_key = [list(personas)[i] for i in range(n)]
+def get_edges(personas,n):          # generar aristas con información del diccionario
+    personas_key = list(personas)   # obtener llaves del diccionario
     aristas = {}
-    for i in range(n):
-        key = personas_key[i]
-        hijos = personas[key]["hijos"]
-        indexes = [personas_key.index(hijos[i]) for i in range(len(hijos))]
+    for i in range(n):                  # para cada vertice
+        key = personas_key[i]           # obtener llave en del vertice
+        hijos = personas[key]["hijos"]  # obtener sus hijos
+        indexes = [personas_key.index(hijos[i]) for i in range(len(hijos))] # obtener index de los hijos
         for j in range(len(indexes)):
             if len(indexes) > 0:
-                aristas[(i,indexes[j])] = personas[key]["weight"][j]
-                aristas[(indexes[j],i)] = personas[key]["weight"][j]
+                aristas[(i,indexes[j])] = personas[key]["weight"][j]    # crear aristas con tupla como index
+                aristas[(indexes[j],i)] = personas[key]["weight"][j]    # almacenar peso del vertice
     return aristas
 
-inf = math.inf
+def find_donors(personas,persona_receptora):
+    n = len(personas)                           # numero de vertices
+    s = list(personas).index(persona_receptora) # persona receptora
+    w = get_edges(personas,n)                   # obtener las aristas
+    
+    E,suma = prim(w,n,s)                        # ejecutar el algoritmo de prim
+    print(f"Despues de aplicar prim:\nAristas = {E}\nd = {suma}")
+    
+    sangre_receptor = personas[persona_receptora]["tipo"]
+    print(f"\nPersona receptora: {list(personas)[s]} {personas[list(personas)[s]]}\n")
+    
+    E_nombres = [[list(personas)[E[i][0]],list(personas)[E[i][1]]] for i in range(len(E))]  # obtener aristas por nombre
+    print("Nombres de donadores:")
+    j = 0
+    for i in range(len(E_nombres)):                 # aplicar filtros para descartar personas que no pueden donar
+        nombre_donador = E_nombres[i][1]
+        edad = personas[nombre_donador]["edad"]     # el donante debe tener la edad apropiada para donar
+        sangre = personas[nombre_donador]["tipo"]   # y el tipo de sangre debe ser compatible
+        if(18 <= edad <= 65 and sangre in compatibilidad[sangre_receptor]["recibe"]):
+            j += 1
+            print(f"{j} {nombre_donador} {personas[nombre_donador]}")
+    
+    g = nx.Graph()
+    for i in range(n):
+        for j in range(n):
+            peso = w[i,j] if (i,j) in list(w) else inf
+            if peso < inf:
+                g.add_edge(list(personas)[i],list(personas)[j],weight=w[i,j])   # agregar arista con peso
+    
+    color_map = ["green" if i == 0 else "red" for i in range(n) ]       # definir color de vertices
+    
+    # definir estilo de grafo
+    pos = graphviz_layout(g, prog="dot")
+    
+    # dibujar todas las conexiones
+    nx.draw(g,
+            pos,
+            with_labels=True,
+            node_color="tab:red",
+            edge_color="tab:gray",
+            node_size=500,
+            width=1,
+    )
+    
+    # dibujar arbol de prim pintando nodo inicial de verde
+    nx.draw(nx.Graph(E_nombres),
+            pos,
+            with_labels=True,
+            node_color=color_map,
+            edge_color="tab:blue",
+            node_size=500,
+            width=3,
+    )
+    
+    # dibujar pesos en aristas
+    edge_labels = nx.get_edge_attributes(g, "weight")
+    nx.draw_networkx_edge_labels(g, pos, edge_labels)
+    
+    # desplegar grafo en pantalla
+    plt.draw()
+    plt.show()
+
+inf = math.inf          # definir infinito
 
 compatibilidad = {
         "a+": {"recibe":["a+","a-","o+","o-"]},
@@ -69,62 +131,4 @@ personas = {
         "Levi"  :{"edad":5 ,"tipo":"a-" ,"hijos":[]                      ,"weight":[]},
 }
 
-n = len(personas)
-s = list(personas).index("Eren")
-w = get_edges(personas,n)
-
-E,suma = prim(w,n,s)
-print(f"Despues de aplicar prim:\nAristas = {E}\nd = {suma}")
-
-sangre_receptor = personas[list(personas)[s]]["tipo"]
-print(f"\nPersona receptora: {list(personas)[s]} {personas[list(personas)[s]]}\n")
-
-E_nombres = [[list(personas)[E[i][0]],list(personas)[E[i][1]]] for i in range(len(E))]
-print("Nombres de donadores:")
-j = 0
-for i in range(len(E_nombres)):
-    nombre_donador = E_nombres[i][1]
-    edad = personas[nombre_donador]["edad"]
-    sangre = personas[nombre_donador]["tipo"]
-    if(18 <= edad <= 65 and sangre in compatibilidad[sangre_receptor]["recibe"]):
-        j += 1
-        print(f"{j} {nombre_donador} {personas[nombre_donador]}")
-
-g = nx.Graph()
-for i in range(n):
-    for j in range(n):
-        peso = w[i,j] if (i,j) in list(w) else inf
-        if peso < inf:
-            g.add_edge(list(personas)[i],list(personas)[j],weight=w[i,j])
-
-color_map = ["green" if i == 0 else "red" for i in range(n) ]
-
-pos = graphviz_layout(g, prog="dot")
-
-# dibujar todas las conexiones
-nx.draw(g,
-        pos,
-        with_labels=True,
-        node_color="tab:red",
-        edge_color="tab:gray",
-        node_size=500,
-        width=1,
-)
-
-# dibujar arbol de prim pintando nodo inicial de verde
-nx.draw(nx.Graph(E_nombres),
-        pos,
-        with_labels=True,
-        node_color=color_map,
-        edge_color="tab:blue",
-        node_size=500,
-        width=3,
-)
-
-# dibujar pesos en aristas
-edge_labels = nx.get_edge_attributes(g, "weight")
-nx.draw_networkx_edge_labels(g, pos, edge_labels)
-
-# desplegar grafo en pantalla
-plt.draw()
-plt.show()
+find_donors(personas,"Eren")
