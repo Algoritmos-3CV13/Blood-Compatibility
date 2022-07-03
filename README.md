@@ -8,4 +8,4 @@ This program chooses the best donors using the Prim's algorithm.
 ![screen2](https://i.imgur.com/MXiE3Bc.png "Results")
 
 ## LICENSE
-[LICENSE](LICENSE)
+[GPLv3.0](LICENSE)
