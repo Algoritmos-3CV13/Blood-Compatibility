@@ -5,7 +5,7 @@ This program chooses the best donors using the Prim's algorithm.
 
 ## Screenshots
 ![screen1](https://i.imgur.com/EbZongU.png "Graph")
-![screen2](https://i.imgur.com/MXiE3Bc.png "Results")
+![screen2](https://i.imgur.com/N49QwQ8.png "Results")
 
 ## LICENSE
 [GPLv3.0](LICENSE)
